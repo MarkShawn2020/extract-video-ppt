@@ -15,8 +15,14 @@ python setup.py install --user
 # Install in development mode
 pip install -e .
 
-# Run the tool
-evp --similarity 0.6 --pdfname output.pdf ./output ./input.mp4
+# Run the tool - PNG export (default)
+evp --format png --similarity 0.6 ./output ./input.mp4
+
+# Run the tool - PDF export without timestamps
+evp --format pdf --pdfname output.pdf --similarity 0.6 ./output ./input.mp4
+
+# Run the tool - PDF export with timestamp overlay
+evp --format pdf --add-timestamp --pdfname output.pdf ./output ./input.mp4
 ```
 
 ## Architecture
@@ -44,8 +50,12 @@ evp --similarity 0.6 --pdfname output.pdf ./output ./input.mp4
 - Frame comparison uses `classify_hist_with_split()` which splits images into RGB channels for histogram comparison
 - PDF generation creates landscape pages with dimensions based on video aspect ratio
 - Time parsing supports formats like "0:00:09" and "00:00:30"
-- Frame extraction stores images temporarily in output directory before PDF generation
-- Cleanup phase removes temporary image files after PDF creation
+- Frame extraction stores images temporarily in output directory before export
+- Cleanup phase removes temporary image files after export
+- **Export formats**: PNG (default) saves frames with readable timestamp filenames, PDF creates document
+- **Timestamp overlay**: Optional feature (--add-timestamp) adds time overlay on bottom-left of frames
+- **PNG export**: Creates 'frames' subdirectory with files named 'timestamp_HH-MM-SS_similarity_X.XX.png'
+- **PDF export**: Can include or exclude timestamp titles based on --add-timestamp flag
 
 ## Recent Changes
 - fpdf2 API updates: Use named parameters when calling pdf.image

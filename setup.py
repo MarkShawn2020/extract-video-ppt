@@ -25,7 +25,8 @@ setuptools.setup(
         'fpdf2',
         'matplotlib',
         'opencv-python',
-        'numpy'
+        'numpy',
+        'tqdm'
     ],
     entry_points='''
         [console_scripts]
