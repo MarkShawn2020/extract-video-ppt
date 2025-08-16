@@ -1,4 +1,4 @@
-# extract-video-ppt
+# video2ppt
 
 Extract presentation slides from videos with accurate timestamps.
 
@@ -16,8 +16,8 @@ Extract presentation slides from videos with accurate timestamps.
 
 ```bash
 # Clone and install locally
-git clone https://github.com/markshawn2020/extract-video-ppt.git
-cd extract-video-ppt
+git clone https://github.com/markshawn2020/video2ppt.git
+cd video2ppt
 pip install -e .
 ```
 
