@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-extract-video-ppt is a Python command-line tool that extracts PowerPoint-like slides from video content by identifying key frames with significant visual differences and converting them to PDF.
+video2ppt is a Python command-line tool that extracts PowerPoint-like slides from video content by identifying key frames with significant visual differences and converting them to PDF.
 
 ## Development Commands
 
@@ -16,13 +16,15 @@ python setup.py install --user
 pip install -e .
 
 # Run the tool - PNG export (default)
-evp --format png --similarity 0.6 ./output ./input.mp4
+video2ppt --format png --similarity 0.6 ./output ./input.mp4
+# Or use short alias
+v2p --format png --similarity 0.6 ./output ./input.mp4
 
 # Run the tool - PDF export without timestamps
-evp --format pdf --pdfname output.pdf --similarity 0.6 ./output ./input.mp4
+video2ppt --format pdf --pdfname output.pdf --similarity 0.6 ./output ./input.mp4
 
 # Run the tool - PDF export with timestamp overlay
-evp --format pdf --add-timestamp --pdfname output.pdf ./output ./input.mp4
+video2ppt --format pdf --add-timestamp --pdfname output.pdf ./output ./input.mp4
 ```
 
 ## Architecture

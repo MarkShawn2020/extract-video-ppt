@@ -1,0 +1,6 @@
+click
+fpdf2
+matplotlib
+opencv-python
+numpy
+tqdm

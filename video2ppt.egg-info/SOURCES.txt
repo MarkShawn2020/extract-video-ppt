@@ -1,0 +1,13 @@
+LICENSE
+README.md
+setup.py
+video2ppt/__init__.py
+video2ppt/compare.py
+video2ppt/images2pdf.py
+video2ppt/video2ppt.py
+video2ppt.egg-info/PKG-INFO
+video2ppt.egg-info/SOURCES.txt
+video2ppt.egg-info/dependency_links.txt
+video2ppt.egg-info/entry_points.txt
+video2ppt.egg-info/requires.txt
+video2ppt.egg-info/top_level.txt
