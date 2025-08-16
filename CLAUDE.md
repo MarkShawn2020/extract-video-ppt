@@ -58,5 +58,9 @@ evp --format pdf --add-timestamp --pdfname output.pdf ./output ./input.mp4
 - **PDF export**: Can include or exclude timestamp titles based on --add-timestamp flag
 
 ## Recent Changes
+- **Critical Fix**: Fixed cumulative timestamp error by using CAP_PROP_POS_MSEC for accurate timestamps
+  - Previously used integer FPS causing up to 15s error in 7-minute videos
+  - Now uses float FPS and actual video timestamps
+- Fixed timestamp calculation: Use integer division instead of math.ceil
 - fpdf2 API updates: Use named parameters when calling pdf.image
 - Fixed description errors in setup.py

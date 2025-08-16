@@ -93,8 +93,8 @@ def start():
     global CV_CAP_PROP_FRAME_HEIGHT
 
     vcap = cv2.VideoCapture(URL)
-    FPS = int(vcap.get(5))
-    TOTAL_FRAME= int(vcap.get(7))
+    FPS = vcap.get(cv2.CAP_PROP_FPS)  # Keep as float for accuracy
+    TOTAL_FRAME= int(vcap.get(cv2.CAP_PROP_FRAME_COUNT))
 
     if TOTAL_FRAME == 0:
         exitByPrint('Please check if the video url is correct')
@@ -106,8 +106,9 @@ def start():
         exitByPrint('video duration is not support')
     
     # set start frame
-    vcap.set(cv2.CAP_PROP_POS_FRAMES, START_FRAME * FPS)
-    frameCount = ((int(TOTAL_FRAME / FPS) if END_FRAME == INFINITY else END_FRAME) - START_FRAME) * FPS
+    vcap.set(cv2.CAP_PROP_POS_MSEC, START_FRAME * 1000)  # Use milliseconds for accuracy
+    total_duration = TOTAL_FRAME / FPS if END_FRAME == INFINITY else END_FRAME
+    frameCount = int((total_duration - START_FRAME) * FPS)
 
     lastDegree = 0
     lastFrame = []
@@ -119,7 +120,7 @@ def start():
     duration = frameCount / FPS
     
     if not QUIET_MODE:
-        click.echo(f'\nProcessing: {video_name} ({CV_CAP_PROP_FRAME_WIDTH}x{CV_CAP_PROP_FRAME_HEIGHT}, {duration:.1f}s)')
+        click.echo(f'\nProcessing: {video_name} ({CV_CAP_PROP_FRAME_WIDTH}x{CV_CAP_PROP_FRAME_HEIGHT}, {duration:.1f}s @ {FPS:.2f}fps)')
     
     # Create progress bar
     disable_progress = QUIET_MODE
@@ -142,7 +143,7 @@ def start():
                 readedFrame += 1
                 pbar.update(1)
                 
-                if readedFrame % FPS != 0:
+                if readedFrame % int(FPS) != 0:  # Process approximately once per second
                     continue
 
                 isWrite = False
@@ -156,7 +157,9 @@ def start():
                     isWrite = True
 
                 if isWrite:
-                    current_second = math.ceil((readedFrame + START_FRAME * FPS) / FPS)
+                    # Get actual timestamp from video
+                    current_time_ms = vcap.get(cv2.CAP_PROP_POS_MSEC)
+                    current_second = int(current_time_ms / 1000)  # Convert to seconds
                     timestamp_str = second2hms(current_second)
                     name = DEFAULT_PATH + '/frame'+ timestamp_str + '-' + str(lastDegree) + '.jpg'
                     
