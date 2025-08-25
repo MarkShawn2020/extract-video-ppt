@@ -30,9 +30,8 @@ jobs:
   signed-release:
     name: Build Signed Release
     runs-on: macos-latest
-    if: |
-      github.repository_owner == 'markshawn2020' &&
-      secrets.APPLE_CERTIFICATE != ''
+    # Only run if triggered by the repository owner
+    if: github.repository_owner == 'markshawn2020'
     
     permissions:
       contents: write
@@ -42,6 +41,35 @@ jobs:
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
+      
+      # Check if required secrets are configured
+      - name: Validate Secrets
+        id: check-secrets
+        run: |
+          if [[ -z "${{ secrets.APPLE_CERTIFICATE }}" ]]; then
+            echo "::error::APPLE_CERTIFICATE secret is not configured. Please add it to your repository secrets."
+            echo "::notice::To use signed releases, you need to configure Apple Developer certificates as GitHub secrets."
+            echo "SECRETS_CONFIGURED=false" >> $GITHUB_OUTPUT
+            exit 1
+          fi
+          
+          if [[ -z "${{ secrets.APPLE_CERTIFICATE_PASSWORD }}" ]]; then
+            echo "::error::APPLE_CERTIFICATE_PASSWORD secret is not configured."
+            exit 1
+          fi
+          
+          if [[ -z "${{ secrets.APPLE_TEAM_ID }}" ]]; then
+            echo "::error::APPLE_TEAM_ID secret is not configured."
+            exit 1
+          fi
+          
+          if [[ -z "${{ secrets.APPLE_IDENTITY }}" ]]; then
+            echo "::error::APPLE_IDENTITY secret is not configured."
+            exit 1
+          fi
+          
+          echo "✅ All required secrets are configured"
+          echo "SECRETS_CONFIGURED=true" >> $GITHUB_OUTPUT
       
       - name: Setup Xcode
         uses: maxim-lobanov/setup-xcode@v1
