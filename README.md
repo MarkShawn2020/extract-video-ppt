@@ -91,12 +91,21 @@ cd video2ppt
 ./build_dmg_pro.sh --build
 ```
 
-### Enable Finder Extension
+### Enable Right-Click Menu
 
-After installation:
+**Option 1: Quick Action (Works Immediately!)**
+Since the app is unsigned, use this alternative that works without special permissions:
+```bash
+# Run this command after installing the app:
+/Applications/Video2PPT.app/Contents/Resources/scripts/install-quick-action.sh
+```
+Then right-click any video → **Quick Actions** → **Convert to PPT**
+
+**Option 2: Finder Extension (Requires signed app)**
 1. Open **System Settings**
 2. Go to **Privacy & Security** → **Extensions** → **Finder Extensions**
 3. Check **"Video2PPT Extension"**
+*Note: This may not work with unsigned apps*
 
 ## 🎬 Usage
 

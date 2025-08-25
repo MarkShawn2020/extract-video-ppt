@@ -54,6 +54,13 @@ fi
 echo ""
 echo "✅ App built at: $APP_PATH"
 
+# Copy scripts to app bundle Resources
+echo "📝 Copying Quick Action scripts to app bundle..."
+mkdir -p "$APP_PATH/Contents/Resources/scripts"
+cp -r scripts/*.sh "$APP_PATH/Contents/Resources/scripts/" 2>/dev/null || true
+cp -r scripts/*.applescript "$APP_PATH/Contents/Resources/scripts/" 2>/dev/null || true
+chmod +x "$APP_PATH/Contents/Resources/scripts/"*.sh 2>/dev/null || true
+
 # Auto-install if requested
 if [ "$AUTO_INSTALL" = true ]; then
     echo ""
