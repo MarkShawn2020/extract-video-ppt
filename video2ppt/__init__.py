@@ -1,6 +1,6 @@
 """Video2PPT - Extract PowerPoint-like slides from video content."""
 
-__version__ = "1.0.3"
+__version__ = "2.0.0"
 
 from .video2ppt import main
 

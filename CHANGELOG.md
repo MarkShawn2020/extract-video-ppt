@@ -5,6 +5,40 @@ All notable changes to Video2PPT will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/),
 and this project adheres to [Semantic Versioning](https://semver.org/).
 
+## [2.0.0](https://github.com/markshawn2020/video2ppt/compare/v1.0.3...v2.0.0) (2025-08-25)
+
+### ⚠ BREAKING CHANGES
+
+* Finder Extension requires manual activation in System Settings
+
+Added features:
+- ExtensionManager for detecting and activating Finder Extension
+- In-app extension status indicator with direct link to settings
+- First-launch prompt to guide users through extension activation
+- Self-signing script for better extension compatibility
+- Comprehensive installation guide with troubleshooting steps
+- FAQ documentation for common issues
+- Diagnostic tools for debugging extension problems
+
+Fixed issues:
+- Extension not appearing due to unsigned app (documented workaround)
+- Version synchronization across all components
+- Build workflow now attempts app signing
+
+Documentation:
+- Added detailed INSTALLATION_GUIDE.md with step-by-step instructions
+- Created FAQ.md addressing common questions and issues
+- Updated README with prominent extension activation notice
+- Added troubleshooting section for extension problems
+
+This addresses the issue where users couldn't see the right-click
+'Convert to PPT' option after installing the app. The root cause is
+macOS security restrictions on unsigned Finder Extensions.
+
+### ✨ Features
+
+* add extension activation support and comprehensive documentation ([2c6b459](https://github.com/markshawn2020/video2ppt/commit/2c6b4592415ee873358879e0b14cab7a7896d95e))
+
 ## [1.0.3](https://github.com/markshawn2020/video2ppt/compare/v1.0.2...v1.0.3) (2025-08-25)
 
 ### 🐛 Bug Fixes
