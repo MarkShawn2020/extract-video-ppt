@@ -76,6 +76,9 @@ class AppDelegate: NSObject, NSApplicationDelegate, ObservableObject {
         
         registerExtension()
         setupDistributedNotifications()
+        
+        // Check and prompt for extension activation
+        ExtensionManager.shared.checkAndPromptForActivation()
     }
     
     // URL scheme handling is now done in SwiftUI's onOpenURL

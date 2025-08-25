@@ -69,8 +69,13 @@ cd video2ppt
 
 1. Download the latest DMG from [Releases](https://github.com/markshawn2020/video2ppt/releases)
 2. Open DMG and drag Video2PPT to Applications
-3. Launch Video2PPT once
-4. Enable extension: **System Settings → Privacy & Security → Extensions → Finder Extensions**
+3. **Important**: Right-click Video2PPT and select "Open" for first launch (unsigned app)
+4. **Enable Extension** (for right-click menu):
+   - The app will prompt you to enable the extension
+   - Or go to: **System Settings → Privacy & Security → Extensions → Finder Extensions**
+   - Check **"Video2PPT Extension"**
+   
+⚠️ **Note**: The right-click context menu requires manual extension activation. See the [Installation Guide](docs/INSTALLATION_GUIDE.md) for detailed instructions and troubleshooting.
 
 ### Method 2: Build from Source
 
@@ -184,9 +189,19 @@ video_folder/
     └── output.pdf (if PDF format selected)
 ```
 
+## 📚 Documentation
+
+- **[📖 Installation Guide](docs/INSTALLATION_GUIDE.md)** - Detailed setup instructions
+- **[❓ FAQ](docs/FAQ.md)** - Frequently asked questions  
+- **[🚀 Release Workflow](docs/RELEASE_WORKFLOW.md)** - CI/CD documentation
+
 ## 🐛 Troubleshooting
 
 ### Extension Not Appearing
+
+**⚠️ Known Issue**: The Finder Extension may not work due to the app being unsigned. Workarounds:
+1. Use the main app (drag & drop files)
+2. See the [Installation Guide](docs/INSTALLATION_GUIDE.md#-troubleshooting) for detailed solutions
 
 ```bash
 # 1. Check if extension is enabled

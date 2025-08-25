@@ -147,6 +147,10 @@ jobs:
             CODE_SIGNING_REQUIRED=NO \
             MARKETING_VERSION="$VERSION" \
             CURRENT_PROJECT_VERSION="$VERSION"
+          
+          # Try to sign the app (will create self-signed cert if needed)
+          chmod +x scripts/sign-app.sh
+          ./scripts/sign-app.sh video2ppt/build/Build/Products/Release/Video2PPT.app || echo "⚠️ Signing failed, continuing with unsigned app"
       
       - name: Create DMG
         id: dmg

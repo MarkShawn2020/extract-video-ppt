@@ -82,6 +82,35 @@ struct ContentView: View {
     // MARK: - Header Section
     private var headerSection: some View {
         VStack(spacing: 12) {
+            // Extension status indicator
+            HStack {
+                Spacer()
+                Button(action: {
+                    ExtensionManager.shared.openExtensionPreferences()
+                }) {
+                    HStack(spacing: 6) {
+                        Image(systemName: ExtensionManager.shared.isExtensionEnabled() ? "checkmark.circle.fill" : "exclamationmark.triangle.fill")
+                            .font(.system(size: 14))
+                            .foregroundColor(ExtensionManager.shared.isExtensionEnabled() ? .green : .orange)
+                        Text(ExtensionManager.shared.isExtensionEnabled() ? "Extension Active" : "Extension Disabled")
+                            .font(.system(size: 12))
+                            .foregroundColor(Color(red: 0.4, green: 0.4, blue: 0.5))
+                    }
+                    .padding(.horizontal, 12)
+                    .padding(.vertical, 6)
+                    .background(
+                        Capsule()
+                            .fill(Color.white.opacity(0.9))
+                            .shadow(color: Color.black.opacity(0.05), radius: 3, x: 0, y: 1)
+                    )
+                }
+                .buttonStyle(.plain)
+                .help(ExtensionManager.shared.isExtensionEnabled() ? 
+                      "Right-click context menu is enabled" : 
+                      "Click to enable right-click context menu")
+            }
+            .padding(.horizontal)
+            
             ZStack {
                 Circle()
                     .fill(LinearGradient(
