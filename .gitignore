@@ -151,6 +151,14 @@ check_dependencies.py
 *_frames/
 output.pdf
 
+# DMG installer files
+*.dmg
+dmg_temp/
+dmg_*.png
+
+# Debug scripts
+debug_*.sh
+
 # IDE
 .vscode/
 .idea/
@@ -179,4 +187,5 @@ yarn-error.log*
 *.backup
 *.old
 *.orig
-*.rej
+*.rej.DS_Store
+.DS_Store

@@ -18,7 +18,7 @@ class ConversionManager: ObservableObject {
         pdfName: String,
         addTimestamp: Bool,
         progressHandler: @escaping (Double, String) -> Void
-    ) async {
+    ) async -> URL? {
         await MainActor.run {
             self.isConverting = true
             self.progress = 0.0
@@ -43,7 +43,7 @@ class ConversionManager: ObservableObject {
                 self.statusMessage = "Failed to create output directory: \(error.localizedDescription)"
                 self.isConverting = false
             }
-            return
+            return nil
         }
         
         await withCheckedContinuation { continuation in
@@ -68,7 +68,10 @@ class ConversionManager: ObservableObject {
             self.statusMessage = "Conversion completed!"
         }
         
-        openOutputFolder(outputDir)
+        NSLog("Video2PPT: Conversion completed. Returning output directory: \(outputDir.path)")
+        NSLog("Video2PPT: NOT opening Finder automatically")
+        
+        return outputDir
     }
     
     nonisolated private func runPythonScript(
@@ -251,8 +254,10 @@ class ConversionManager: ObservableObject {
         return "video2ppt"
     }
     
-    private func openOutputFolder(_ url: URL) {
+    func openOutputFolder(_ url: URL) {
+        NSLog("Video2PPT: User clicked 'Open in Finder' button for path: \(url.path)")
         NSWorkspace.shared.selectFile(nil, inFileViewerRootedAtPath: url.path)
+        NSLog("Video2PPT: Finder should now be opened showing the output folder")
     }
     
     func cancelConversion() {
