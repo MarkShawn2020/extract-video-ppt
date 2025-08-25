@@ -5,6 +5,16 @@ All notable changes to Video2PPT will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/),
 and this project adheres to [Semantic Versioning](https://semver.org/).
 
+## [1.0.2](https://github.com/markshawn2020/video2ppt/compare/v1.0.1...v1.0.2) (2025-08-25)
+
+### 🐛 Bug Fixes
+
+* resolve test build workflow failures ([1bd4ed1](https://github.com/markshawn2020/video2ppt/commit/1bd4ed1538b5a96578a0269efb63b7a95eb551af))
+
+### 📚 Documentation
+
+* add release workflow documentation and test script ([1e0484f](https://github.com/markshawn2020/video2ppt/commit/1e0484fa4b25e75100694abb032d5b194e41adfb))
+
 ## [1.0.1](https://github.com/markshawn2020/video2ppt/compare/v1.0.0...v1.0.1) (2025-08-25)
 
 ### 🐛 Bug Fixes
