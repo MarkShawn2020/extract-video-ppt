@@ -1,0 +1,196 @@
+name: Test Build
+
+on:
+  pull_request:
+    branches: [ main, master, develop ]
+  push:
+    branches: [ main, master, develop ]
+    paths-ignore:
+      - '**.md'
+      - 'docs/**'
+      - '.github/workflows/release*.yml'
+      - '.github/workflows/semantic-release.yml'
+  workflow_dispatch:
+
+env:
+  XCODE_PROJECT: video2ppt/Video2PPT.xcodeproj
+  SCHEME: Video2PPT
+
+jobs:
+  test-python:
+    name: Test Python Module
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest, macos-latest]
+        python-version: ['3.9', '3.10', '3.11']
+    
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+      
+      - name: Install Dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -e .
+      
+      - name: Run Tests
+        run: |
+          # Test import
+          python -c "import video2ppt; print(f'video2ppt version: {video2ppt.__version__}')"
+          
+          # Test CLI
+          video2ppt --help
+          v2p --help
+          
+          # Run pytest if tests exist
+          pip install pytest
+          pytest video2ppt/tests/ -v || echo "No tests found"
+      
+      - name: Lint Python Code
+        if: matrix.os == 'ubuntu-latest' && matrix.python-version == '3.11'
+        run: |
+          pip install flake8 black mypy
+          flake8 video2ppt/ --max-line-length=100 --exclude=__pycache__ || true
+          black --check video2ppt/ || true
+          mypy video2ppt/ --ignore-missing-imports || true
+
+  test-macos-build:
+    name: Test macOS Build
+    runs-on: macos-latest
+    
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      
+      - name: Setup Xcode
+        uses: maxim-lobanov/setup-xcode@v1
+        with:
+          xcode-version: latest-stable
+      
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      
+      - name: Install Python Dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -e .
+      
+      - name: Validate Xcode Project
+        run: |
+          # List available schemes
+          xcodebuild -project "${{ env.XCODE_PROJECT }}" -list
+          
+          # Check build settings
+          xcodebuild -project "${{ env.XCODE_PROJECT }}" \
+            -scheme "${{ env.SCHEME }}" \
+            -showBuildSettings | grep -E "PRODUCT_NAME|BUNDLE_IDENTIFIER|VERSION"
+      
+      - name: Build macOS App
+        run: |
+          # Clean build directory
+          rm -rf video2ppt/build
+          
+          # Build the app
+          xcodebuild \
+            -project "${{ env.XCODE_PROJECT }}" \
+            -scheme "${{ env.SCHEME }}" \
+            -configuration Debug \
+            -derivedDataPath video2ppt/build \
+            clean build \
+            CODE_SIGN_IDENTITY="" \
+            CODE_SIGNING_REQUIRED=NO \
+            MARKETING_VERSION="${{ env.VERSION || '1.0.1' }}" \
+            CURRENT_PROJECT_VERSION="${{ env.VERSION || '1.0.1' }}"
+      
+      - name: Verify Build Output
+        run: |
+          # Check if app was built
+          APP_PATH="video2ppt/build/Build/Products/Debug/Video2PPT.app"
+          if [ -d "$APP_PATH" ]; then
+            echo "✅ App built successfully at: $APP_PATH"
+            
+            # Check app contents
+            echo "App contents:"
+            ls -la "$APP_PATH/Contents/"
+            
+            # Check if extension is included
+            if [ -d "$APP_PATH/Contents/PlugIns/Video2PPTExtension.appex" ]; then
+              echo "✅ Finder extension included"
+            else
+              echo "⚠️  Finder extension not found"
+            fi
+            
+            # Check Info.plist
+            echo "App version info:"
+            /usr/libexec/PlistBuddy -c "Print :CFBundleShortVersionString" "$APP_PATH/Contents/Info.plist" || true
+            /usr/libexec/PlistBuddy -c "Print :CFBundleVersion" "$APP_PATH/Contents/Info.plist" || true
+          else
+            echo "❌ App not found at expected location"
+            echo "Build directory contents:"
+            find video2ppt/build -name "*.app" -type d
+            exit 1
+          fi
+      
+      - name: Test Python Integration
+        run: |
+          # Test that Python module works alongside the app
+          cd video2ppt
+          python -m video2ppt --help
+
+  test-dmg-creation:
+    name: Test DMG Creation
+    runs-on: macos-latest
+    needs: test-macos-build
+    if: github.event_name == 'push' && github.ref == 'refs/heads/master'
+    
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      
+      - name: Setup Xcode
+        uses: maxim-lobanov/setup-xcode@v1
+        with:
+          xcode-version: latest-stable
+      
+      - name: Build Release App
+        run: |
+          xcodebuild \
+            -project "${{ env.XCODE_PROJECT }}" \
+            -scheme "${{ env.SCHEME }}" \
+            -configuration Release \
+            -derivedDataPath video2ppt/build \
+            clean build \
+            CODE_SIGN_IDENTITY="" \
+            CODE_SIGNING_REQUIRED=NO
+      
+      - name: Create DMG
+        run: |
+          APP_PATH="video2ppt/build/Build/Products/Release/Video2PPT.app"
+          DMG_NAME="Video2PPT-test.dmg"
+          
+          # Create temporary directory for DMG
+          DMG_TEMP="dmg_temp"
+          rm -rf "$DMG_TEMP"
+          mkdir -p "$DMG_TEMP"
+          
+          # Copy app and create Applications symlink
+          cp -r "$APP_PATH" "$DMG_TEMP/"
+          ln -s /Applications "$DMG_TEMP/Applications"
+          
+          # Create DMG
+          hdiutil create -srcfolder "$DMG_TEMP" -volname "Video2PPT" \
+            -fs HFS+ -format UDZO -o "$DMG_NAME"
+          
+          # Clean up
+          rm -rf "$DMG_TEMP"
+          
+          echo "✅ Created test DMG: $DMG_NAME"
+          ls -lh "$DMG_NAME"

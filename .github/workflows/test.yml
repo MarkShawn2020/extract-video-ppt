@@ -12,7 +12,7 @@ on:
   workflow_dispatch:
 
 env:
-  XCODE_PROJECT: Video2PPT/Video2PPT.xcodeproj
+  XCODE_PROJECT: video2ppt/Video2PPT.xcodeproj
   SCHEME: Video2PPT
 
 jobs:
@@ -37,7 +37,7 @@ jobs:
       - name: Install Dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install opencv-python numpy fpdf2 click matplotlib
+          pip install opencv-python numpy fpdf2 click matplotlib tqdm
       
       - name: Build App
         run: |
@@ -58,7 +58,7 @@ jobs:
       
       - name: Check Build Output
         run: |
-          ls -la Video2PPT/build/Build/Products/Debug/ || true
+          ls -la video2ppt/build/Build/Products/Debug/ || true
           
   lint:
     name: Lint Code
