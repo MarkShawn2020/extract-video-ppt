@@ -20,17 +20,28 @@ Since Video2PPT is not signed with an Apple Developer certificate, you need to:
 
 ## 🔧 Enable Right-Click Context Menu
 
-**⚠️ IMPORTANT**: The right-click "Convert to PPT" feature requires enabling the Finder Extension.
+**⚠️ UPDATE**: Due to macOS security restrictions, the Finder Extension doesn't work with unsigned apps. We now provide a **Quick Action** alternative that works immediately!
 
-### Automatic Setup (Recommended)
-1. When you first launch Video2PPT, it will prompt you to enable the extension
-2. Click **"Open System Settings"** in the prompt
-3. The Extensions settings will open automatically
-4. Find **"Video2PPT Extension"** and check the box to enable it
-5. You may need to enter your password
+### NEW: Quick Action Method (Works Immediately!)
+Since the Finder Extension doesn't work with unsigned apps, use this alternative:
 
-### Manual Setup
-If you dismissed the prompt or need to enable it later:
+1. **Run the setup script** (included with the app):
+   ```bash
+   /Applications/Video2PPT.app/Contents/Resources/scripts/install-quick-action.sh
+   ```
+   Or download and run:
+   ```bash
+   curl -sL https://raw.githubusercontent.com/markshawn2020/video2ppt/master/scripts/install-quick-action.sh | bash
+   ```
+
+2. **Right-click any video file**
+3. Go to **Quick Actions** (or **Services** on older macOS)
+4. Select **"Convert to PPT"**
+
+✅ This works immediately without any system settings changes!
+
+### Original Finder Extension Method (Doesn't work with unsigned apps)
+Note: This method requires a properly signed app with an Apple Developer certificate.
 
 #### Method 1: From the App
 1. Open Video2PPT
