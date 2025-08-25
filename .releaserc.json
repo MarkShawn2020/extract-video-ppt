@@ -1,0 +1,66 @@
+{
+  "branches": ["main", "master"],
+  "plugins": [
+    ["@semantic-release/commit-analyzer", {
+      "preset": "conventionalcommits",
+      "releaseRules": [
+        {"type": "feat", "release": "minor"},
+        {"type": "fix", "release": "patch"},
+        {"type": "perf", "release": "patch"},
+        {"type": "refactor", "release": "patch"},
+        {"type": "style", "release": "patch"},
+        {"type": "docs", "scope": "README", "release": "patch"},
+        {"type": "build", "scope": "deps", "release": "patch"},
+        {"breaking": true, "release": "major"},
+        {"revert": true, "release": "patch"}
+      ],
+      "parserOpts": {
+        "noteKeywords": ["BREAKING CHANGE", "BREAKING CHANGES", "BREAKING"]
+      }
+    }],
+    ["@semantic-release/release-notes-generator", {
+      "preset": "conventionalcommits",
+      "presetConfig": {
+        "types": [
+          {"type": "feat", "section": "✨ Features", "hidden": false},
+          {"type": "fix", "section": "🐛 Bug Fixes", "hidden": false},
+          {"type": "perf", "section": "⚡ Performance", "hidden": false},
+          {"type": "refactor", "section": "♻️ Refactoring", "hidden": false},
+          {"type": "docs", "section": "📚 Documentation", "hidden": false},
+          {"type": "style", "section": "💄 Styling", "hidden": false},
+          {"type": "test", "section": "✅ Tests", "hidden": false},
+          {"type": "build", "section": "📦 Build System", "hidden": false},
+          {"type": "ci", "section": "🎡 CI/CD", "hidden": false},
+          {"type": "chore", "section": "🔧 Maintenance", "hidden": false},
+          {"type": "revert", "section": "⏪ Reverts", "hidden": false}
+        ]
+      }
+    }],
+    ["@semantic-release/changelog", {
+      "changelogFile": "CHANGELOG.md",
+      "changelogTitle": "# Changelog\n\nAll notable changes to Video2PPT will be documented in this file.\n\nThe format is based on [Keep a Changelog](https://keepachangelog.com/),\nand this project adheres to [Semantic Versioning](https://semver.org/)."
+    }],
+    ["@semantic-release/exec", {
+      "prepareCmd": "echo 'VERSION=${nextRelease.version}' >> $GITHUB_ENV && ./scripts/update-version.sh ${nextRelease.version}",
+      "publishCmd": "echo '::set-output name=new_release_version::${nextRelease.version}' && echo '::set-output name=new_release_published::true'"
+    }],
+    ["@semantic-release/git", {
+      "assets": [
+        "CHANGELOG.md",
+        "package.json",
+        "package-lock.json",
+        "video2ppt/__init__.py",
+        "video2ppt/Video2PPT/Info.plist"
+      ],
+      "message": "chore(release): ${nextRelease.version} [skip ci]\n\n${nextRelease.notes}"
+    }],
+    ["@semantic-release/github", {
+      "assets": [
+        {"path": "Video2PPT-*.dmg", "label": "Video2PPT-v${nextRelease.version}.dmg"}
+      ],
+      "successComment": "🎉 This PR is included in version ${nextRelease.version}",
+      "failComment": false,
+      "releasedLabels": ["released"]
+    }]
+  ]
+}

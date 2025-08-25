@@ -1,0 +1,55 @@
+{
+  "name": "video2ppt",
+  "version": "0.0.0",
+  "description": "Extract presentation slides from videos with native macOS app",
+  "private": true,
+  "scripts": {
+    "prepare": "husky install",
+    "commit": "cz",
+    "release": "semantic-release",
+    "release:dry": "semantic-release --dry-run",
+    "lint:commit": "commitlint --from HEAD~1 --to HEAD --verbose"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/markshawn2020/video2ppt.git"
+  },
+  "keywords": [
+    "video",
+    "ppt",
+    "converter",
+    "macos",
+    "finder-extension"
+  ],
+  "author": "markshawn2020",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/markshawn2020/video2ppt/issues"
+  },
+  "homepage": "https://github.com/markshawn2020/video2ppt#readme",
+  "devDependencies": {
+    "@commitlint/cli": "^18.4.3",
+    "@commitlint/config-conventional": "^18.4.3",
+    "@semantic-release/changelog": "^6.0.3",
+    "@semantic-release/commit-analyzer": "^11.1.0",
+    "@semantic-release/exec": "^6.0.3",
+    "@semantic-release/git": "^10.0.1",
+    "@semantic-release/github": "^9.2.6",
+    "@semantic-release/release-notes-generator": "^12.1.0",
+    "commitizen": "^4.3.0",
+    "conventional-changelog-conventionalcommits": "^7.0.2",
+    "cz-conventional-changelog": "^3.3.0",
+    "husky": "^8.0.3",
+    "semantic-release": "^22.0.12"
+  },
+  "config": {
+    "commitizen": {
+      "path": "./node_modules/cz-conventional-changelog"
+    }
+  },
+  "husky": {
+    "hooks": {
+      "commit-msg": "commitlint -E HUSKY_GIT_PARAMS"
+    }
+  }
+}
