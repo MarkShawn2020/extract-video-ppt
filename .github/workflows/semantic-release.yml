@@ -117,7 +117,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
         with:
-          ref: main  # Checkout the updated main branch with version changes
+          ref: master  # Checkout the updated master branch with version changes
           fetch-depth: 0
       
       - name: Setup Xcode
@@ -136,12 +136,12 @@ jobs:
           echo "Building Video2PPT v$VERSION"
           
           # Clean and build
-          rm -rf Video2PPT/build
+          rm -rf video2ppt/build
           xcodebuild \
-            -project Video2PPT/Video2PPT.xcodeproj \
+            -project video2ppt/Video2PPT.xcodeproj \
             -scheme Video2PPT \
             -configuration Release \
-            -derivedDataPath Video2PPT/build \
+            -derivedDataPath video2ppt/build \
             clean build \
             CODE_SIGN_IDENTITY="" \
             CODE_SIGNING_REQUIRED=NO \
@@ -153,7 +153,7 @@ jobs:
         run: |
           VERSION="${{ needs.semantic-release.outputs.new_release_version }}"
           DMG_NAME="Video2PPT-v${VERSION}.dmg"
-          APP_PATH="Video2PPT/build/Build/Products/Release/Video2PPT.app"
+          APP_PATH="video2ppt/build/Build/Products/Release/Video2PPT.app"
           
           # Create DMG
           DMG_TEMP="dmg_temp"

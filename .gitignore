@@ -34,6 +34,7 @@ xcuserdata/
 *.xcuserstate
 *.xcscmblueprint
 *.xcscheme
+!**/xcshareddata/xcschemes/*.xcscheme
 *.hmap
 *.ipa
 *.dSYM.zip

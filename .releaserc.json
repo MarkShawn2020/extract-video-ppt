@@ -1,5 +1,5 @@
 {
-  "branches": ["main", "master"],
+  "branches": ["master"],
   "plugins": [
     ["@semantic-release/commit-analyzer", {
       "preset": "conventionalcommits",
@@ -42,7 +42,7 @@
     }],
     ["@semantic-release/exec", {
       "prepareCmd": "echo 'VERSION=${nextRelease.version}' >> $GITHUB_ENV && ./scripts/update-version.sh ${nextRelease.version}",
-      "publishCmd": "echo '::set-output name=new_release_version::${nextRelease.version}' && echo '::set-output name=new_release_published::true'"
+      "publishCmd": "echo 'new_release_version=${nextRelease.version}' >> $GITHUB_OUTPUT && echo 'new_release_published=true' >> $GITHUB_OUTPUT"
     }],
     ["@semantic-release/git", {
       "assets": [
@@ -50,7 +50,9 @@
         "package.json",
         "package-lock.json",
         "video2ppt/__init__.py",
-        "video2ppt/Video2PPT/Info.plist"
+        "video2ppt/Video2PPT/Info.plist",
+        "video2ppt/Video2PPTExtension/Info.plist",
+        "setup.py"
       ],
       "message": "chore(release): ${nextRelease.version} [skip ci]\n\n${nextRelease.notes}"
     }],
