@@ -52,9 +52,16 @@ jobs:
       
       - name: Test Python Module
         run: |
+          # Install the package first
+          pip install -e .
+          
+          # Test the installed command
+          video2ppt --help
+          v2p --help
+          
+          # Run tests if they exist
           cd video2ppt
           python -m pytest tests/ || echo "No tests found"
-          python -m video2ppt --help
       
       - name: Check Build Output
         run: |

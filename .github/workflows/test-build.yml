@@ -142,8 +142,8 @@ jobs:
       - name: Test Python Integration
         run: |
           # Test that Python module works alongside the app
-          cd video2ppt
-          python -m video2ppt --help
+          video2ppt --help
+          v2p --help
 
   test-dmg-creation:
     name: Test DMG Creation
