@@ -5,7 +5,7 @@ with open("README.md", "r") as fh:
 
 setuptools.setup(
     name='video2ppt',
-    version='1.0.2',
+    version='1.0.3',
     author="wudu",
     author_email="296525335@qq.com",
     description="Extract presentation slides from videos with accurate timestamps",
