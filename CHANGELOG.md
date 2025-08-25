@@ -2,6 +2,41 @@
 
 All notable changes to Video2PPT will be documented in this file.
 
+The format is based on [Keep a Changelog](https://keepachangelog.com/),
+and this project adheres to [Semantic Versioning](https://semver.org/).
+
+## 1.0.0 (2025-08-25)
+
+### ✨ Features
+
+* fix frame rate problem ([e59955c](https://github.com/markshawn2020/video2ppt/commit/e59955c93af325698d11474ade2f2fc5770cd4ec))
+* init CLAUDE ([74bbc92](https://github.com/markshawn2020/video2ppt/commit/74bbc92b744d6c7a163f8d62c56bab6368e1394f))
+* merge support-mac-extension ([92d78a8](https://github.com/markshawn2020/video2ppt/commit/92d78a810502da6a07d828c36fd327ae56c62eff))
+* rename evp --> video2ppt/v2p ([d07c9cd](https://github.com/markshawn2020/video2ppt/commit/d07c9cda67d9cc64928e0985fdbfc9106850789e))
+* support mac right click ([ab0cd1b](https://github.com/markshawn2020/video2ppt/commit/ab0cd1b5f4dc3eeca9b1236978d3bc56f383fe1f))
+* support png export, more friendly, etc. ([51368e8](https://github.com/markshawn2020/video2ppt/commit/51368e8b6a37a5fb012057fa5758dccd7d189724))
+* support semantic release ([c857fde](https://github.com/markshawn2020/video2ppt/commit/c857fdee15ecabdd86a8b9b6dd2315079d020aea))
+* to support release workflow ([67652e5](https://github.com/markshawn2020/video2ppt/commit/67652e526cea99cf08ed173d49e93464dd7da5d5))
+* to support release workflow | update ([9be1cad](https://github.com/markshawn2020/video2ppt/commit/9be1cad5b72422479dcbfa2599abbe02bbee9722))
+
+### 🐛 Bug Fixes
+
+* mac app extension ([9cceee4](https://github.com/markshawn2020/video2ppt/commit/9cceee4ed5e8b0e957d37baa3622e16c346278e5))
+* update mac extension ([d4325ce](https://github.com/markshawn2020/video2ppt/commit/d4325cedac80947bde05fbd1947a9adb793a1ba8))
+
+### 📚 Documentation
+
+* update readme ([9c22aa0](https://github.com/markshawn2020/video2ppt/commit/9c22aa0c99aeee125a63973d9390b037725dada8))
+* update readme ([3cece13](https://github.com/markshawn2020/video2ppt/commit/3cece13928c6446fea2c6f20a9a1749687bd2cb6))
+
+### 📦 Build System
+
+* add package-lock.json for semantic-release workflow ([9eb9959](https://github.com/markshawn2020/video2ppt/commit/9eb9959368879ef7fd9edd5a8cb85aed2ca2280a))
+
+# Changelog
+
+All notable changes to Video2PPT will be documented in this file.
+
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
