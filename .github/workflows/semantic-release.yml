@@ -148,9 +148,9 @@ jobs:
             MARKETING_VERSION="$VERSION" \
             CURRENT_PROJECT_VERSION="$VERSION"
           
-          # Try to sign the app (will create self-signed cert if needed)
-          chmod +x scripts/sign-app.sh
-          ./scripts/sign-app.sh video2ppt/build/Build/Products/Release/Video2PPT.app || echo "⚠️ Signing failed, continuing with unsigned app"
+          # Skip signing in CI - it doesn't provide real benefits for self-signed apps
+          echo "ℹ️ Skipping code signing in CI environment"
+          echo "📝 Note: The app will be distributed unsigned. Users need to right-click and select 'Open' on first launch."
       
       - name: Create DMG
         id: dmg
