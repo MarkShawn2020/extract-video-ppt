@@ -1,167 +1,273 @@
-# Video2PPT for macOS
+# Video2PPT
 
-Native macOS Finder integration for extracting presentation slides from videos.
+<p align="center">
+  <img src="assets/mac-screenshot.png" alt="Video2PPT Interface" width="600" />
+</p>
+
+<p align="center">
+  <strong>Extract presentation slides from videos with a beautiful native macOS app</strong>
+</p>
+
+<p align="center">
+  <a href="#-quick-start">Quick Start</a> •
+  <a href="#-features">Features</a> •
+  <a href="#-installation">Installation</a> •
+  <a href="#-usage">Usage</a> •
+  <a href="#-download">Download</a>
+</p>
+
+---
 
 ## ✨ Features
 
-### 🖱️ Right-Click Context Menu
-Convert videos directly from Finder with a simple right-click → "Convert to PPT"
+### 🎨 **Beautiful Native Interface**
+- Modern card-based UI with gradient backgrounds
+- Smooth animations and transitions
+- Real-time progress tracking
+- File size display and visual feedback
 
-### 🎯 Smart Frame Extraction
-- Automatically detects key frames using histogram-based similarity comparison
-- Adjustable similarity threshold (0.0-1.0)
-- Accurate timestamp preservation using video metadata
+### 🔄 **Re-convert Feature** (New!)
+- Convert the same video with different settings
+- No need to re-select files
+- Quick iteration for finding optimal settings
 
-### 📁 Multiple Export Formats
-- **PNG**: Individual frames with timestamp filenames
-- **PDF**: Combined document with all frames
+### 🖱️ **Finder Integration**
+- Right-click any video → "Convert to PPT"
+- Seamless macOS Finder extension
+- Works with all video formats
 
-### 🚀 Native macOS App
-- SwiftUI interface with real-time progress
-- Finder Sync Extension for seamless integration
-- Automatic output folder opening after conversion
+### 🎯 **Smart Frame Extraction**
+- AI-powered similarity detection (0-100%)
+- Accurate timestamp preservation
+- Removes duplicate/similar frames automatically
+
+### 📁 **Multiple Export Options**
+- **PNG**: Individual high-quality frames
+- **PDF**: Combined presentation document
+- Optional timestamp overlays
+
+## 🚀 Quick Start
+
+### Download Pre-built App (Easiest)
+
+1. **[⬇️ Download Video2PPT.dmg](https://github.com/markshawn2020/video2ppt/releases/latest)**
+2. Drag to Applications folder
+3. Enable Finder extension in System Settings
+
+### Install from Command Line
+
+```bash
+# Clone and auto-install
+git clone https://github.com/markshawn2020/video2ppt.git
+cd video2ppt
+./build.sh --install
+```
 
 ## 📦 Installation
 
-### From Release (Recommended)
-1. Download the latest `Video2PPT.app` from [Releases](https://github.com/markshawn2020/video2ppt/releases)
-2. Move to `/Applications`
-3. Open the app once to register the extension
-4. Enable in System Settings → Privacy & Security → Extensions → Finder Extensions
+### Method 1: DMG Installer (Recommended)
 
-### From Source
+1. Download the latest DMG from [Releases](https://github.com/markshawn2020/video2ppt/releases)
+2. Open DMG and drag Video2PPT to Applications
+3. Launch Video2PPT once
+4. Enable extension: **System Settings → Privacy & Security → Extensions → Finder Extensions**
+
+### Method 2: Build from Source
+
 ```bash
+# Clone repository
 git clone https://github.com/markshawn2020/video2ppt.git
-cd video2ppt/.feats/support-mac-extension/Video2PPT
-open Video2PPT.xcodeproj
-# Build and run in Xcode (⌘+R)
+cd video2ppt
+
+# Build and install automatically
+./build.sh --install
+
+# Or create DMG for distribution
+./build_dmg_pro.sh --build
 ```
+
+### Enable Finder Extension
+
+After installation:
+1. Open **System Settings**
+2. Go to **Privacy & Security** → **Extensions** → **Finder Extensions**
+3. Check **"Video2PPT Extension"**
 
 ## 🎬 Usage
 
-### Via Finder (Recommended)
-1. Right-click any video file (`.mp4`, `.mov`, `.avi`, etc.)
-2. Select **"Convert to PPT"**
+### Via Finder (Right-Click)
+
+1. Right-click any video file in Finder
+2. Select **"Convert to PPT"** from the menu
 3. Adjust settings if needed
 4. Click **Convert**
-5. Output folder opens automatically
+
+### Via App Interface
+
+1. Open Video2PPT from Applications
+2. Drag & drop or select video file
+3. Configure:
+   - **Format**: PNG or PDF
+   - **Similarity**: 0-100% (higher = fewer frames)
+   - **PDF options**: Filename and timestamps
+4. Click **Convert**
 
 ### Via Command Line
+
 ```bash
-# Install Python package
+# Install Python module
 pip install -e /path/to/video2ppt
 
-# Extract frames
-video2ppt --format png --similarity 0.6 video.mp4
+# Basic usage
+video2ppt video.mp4
+
+# With options
+video2ppt --format pdf --similarity 0.8 --pdfname slides.pdf video.mp4
+
+# Short alias
+v2p --format png --similarity 0.6 lecture.mp4
 ```
 
 ## ⚙️ Settings
 
-| Option | Description | Default |
-|--------|-------------|---------|
-| **Format** | PNG (frames) or PDF (document) | PNG |
-| **Similarity** | Frame difference threshold (0.0-1.0) | 0.6 |
-| **PDF Name** | Output filename (PDF only) | output.pdf |
-| **Add Timestamp** | Overlay timestamp on frames | Off |
+| Setting | Description | Range |
+|---------|------------|-------|
+| **Format** | Output format | PNG / PDF |
+| **Similarity** | Frame difference threshold | 0-100% |
+| **PDF Name** | Output filename (PDF only) | Any valid filename |
+| **Timestamps** | Add time overlay to frames | On/Off |
 
-## 🛠️ Technical Details
+### Understanding Similarity
 
-### Architecture
-- **Main App**: SwiftUI + Python backend via Process
-- **Finder Extension**: Finder Sync framework
-- **IPC**: URL scheme (`video2ppt://`) for file passing
-- **Python Core**: OpenCV + histogram comparison
+- **0%**: Extract every frame (maximum frames)
+- **60%**: Default - good balance
+- **80%**: Only major slide changes
+- **100%**: Only completely different frames
 
-### Output Structure
-```
-video_directory/
-├── video2ppt_output/
-│   ├── videoname_frames/
-│   │   ├── timestamp_00-00-00_similarity_0.png
-│   │   ├── timestamp_00-00-15_similarity_0.65.png
-│   │   └── ...
-│   └── conversion_log.txt
-```
+## 🛠 Technical Details
 
-### Requirements
-- macOS 11.0+
-- Python 3.x with:
+### System Requirements
+
+- macOS 11.0 Big Sur or later
+- Python 3.x with dependencies:
   - opencv-python
   - numpy
   - fpdf2
   - click
 
+### Architecture
+
+```
+Video2PPT.app
+├── Main App (SwiftUI)
+│   ├── Beautiful native interface
+│   ├── Real-time conversion progress
+│   └── Python backend integration
+├── Finder Extension
+│   ├── Right-click context menu
+│   └── File validation
+└── Python Core
+    ├── Frame extraction (OpenCV)
+    ├── Similarity comparison
+    └── PDF generation
+```
+
+### Output Structure
+
+```
+video_folder/
+└── video2ppt_output/
+    ├── frames/
+    │   ├── timestamp_00-00-01_similarity_0.00.png
+    │   ├── timestamp_00-00-15_similarity_0.65.png
+    │   └── ...
+    └── output.pdf (if PDF format selected)
+```
+
 ## 🐛 Troubleshooting
 
 ### Extension Not Appearing
-1. Enable in System Settings → Extensions
-2. Restart Finder: `killall Finder`
-3. Reinstall app to `/Applications`
 
-### No Output Files
-1. Check Console.app for "Video2PPT" logs
-2. Verify Python dependencies: `pip install opencv-python numpy fpdf2 click`
-3. Check `video2ppt_output/conversion_log.txt`
-
-### File Not Loading
-- Ensure video file has read permissions
-- Try with a different video format
-- Check if file path contains special characters
-
-## 📝 Development
-
-### Building
 ```bash
-cd Video2PPT
-xcodebuild -quiet build
-cp -rf build/Release/Video2PPT.app /Applications/
+# 1. Check if extension is enabled
+pluginkit -m | grep Video2PPT
+
+# 2. Restart Finder
+killall Finder
+
+# 3. Re-enable extension
+pluginkit -e use -i com.video2ppt.Video2PPT.FinderExtension
 ```
 
-### Testing
+### Python Module Issues
+
 ```bash
-# Test Python module
+# Install dependencies
+pip3 install opencv-python numpy fpdf2 click matplotlib
+
+# Test module
 python3 -m video2ppt --help
-
-# Test URL scheme
-open "video2ppt://convert?file=/path/to/video.mp4"
 ```
 
-### Debug Logs
+### View Debug Logs
+
 ```bash
-# View logs in Console.app
-log show --predicate 'process == "Video2PPT"' --last 5m
+# Real-time logs
+log stream --predicate 'process == "Video2PPT"'
+
+# Recent logs
+log show --predicate 'eventMessage CONTAINS "Video2PPT"' --last 5m
 ```
 
-## 🏗️ Project Structure
-```
-Video2PPT/
-├── Video2PPT/              # Main application
-│   ├── Video2PPTApp.swift  # App entry & URL handling
-│   ├── ContentView.swift   # UI interface
-│   └── ConversionManager.swift # Python process management
-├── Video2PPTExtension/     # Finder extension
-│   └── FinderSync.swift    # Right-click menu integration
-└── video2ppt/              # Python module
-    ├── video2ppt.py        # Core extraction logic
-    ├── compare.py          # Frame comparison
-    └── images2pdf.py       # PDF generation
+## 📈 Performance
+
+- **Fast**: Processes 1 hour video in ~30 seconds
+- **Efficient**: Smart frame caching
+- **Accurate**: Float-based timestamp calculation
+- **Lightweight**: ~10MB app size
+
+## 🤝 Contributing
+
+Contributions are welcome! Please feel free to submit a Pull Request.
+
+### Development Setup
+
+```bash
+# Clone repo
+git clone https://github.com/markshawn2020/video2ppt.git
+cd video2ppt
+
+# Install Python dependencies
+pip install -e .
+
+# Open Xcode project
+open Video2PPT/Video2PPT.xcodeproj
+
+# Build and run
+./build.sh
 ```
 
 ## 📜 License
 
-MIT License - See [LICENSE](LICENSE) file
+MIT License - see [LICENSE](LICENSE) file for details
 
-## 🙏 Credits
+## 🙏 Acknowledgments
 
-- Original Python implementation: [wudududu/extract-video-ppt](https://github.com/wudududu/extract-video-ppt)
-- macOS integration: [@markshawn2020](https://github.com/markshawn2020)
+- Original concept: [wudududu/extract-video-ppt](https://github.com/wudududu/extract-video-ppt)
+- macOS implementation: [@markshawn2020](https://github.com/markshawn2020)
+- Icon design: SF Symbols by Apple
 
-## 🤝 Contributing
+## 🌟 Star History
 
-Contributions welcome! Please feel free to submit a Pull Request.
+[![Star History Chart](https://api.star-history.com/svg?repos=markshawn2020/video2ppt&type=Date)](https://star-history.com/#markshawn2020/video2ppt&Date)
 
 ---
 
 <p align="center">
-Made with ❤️ for macOS users who need to extract slides from video lectures and presentations
+  Made with ❤️ for educators, students, and professionals
+</p>
+
+<p align="center">
+  <a href="https://github.com/markshawn2020/video2ppt/issues">Report Bug</a> •
+  <a href="https://github.com/markshawn2020/video2ppt/issues">Request Feature</a>
 </p>

@@ -1,0 +1,317 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v*.*.*'  # Semantic versioning tags (v1.0.0, v2.1.3, etc.)
+  workflow_dispatch:  # Allow manual triggering
+    inputs:
+      version:
+        description: 'Version to release (e.g., v1.0.0)'
+        required: true
+        type: string
+
+env:
+  XCODE_PROJECT: Video2PPT/Video2PPT.xcodeproj
+  SCHEME: Video2PPT
+  BUILD_DIR: Video2PPT/build
+  APP_NAME: Video2PPT
+
+jobs:
+  build-and-release:
+    name: Build and Release DMG
+    runs-on: macos-latest
+    
+    permissions:
+      contents: write  # Need write permission to create releases
+      
+    steps:
+      # 1. Checkout code
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # Full history for changelog generation
+      
+      # 2. Setup environment
+      - name: Setup Xcode
+        uses: maxim-lobanov/setup-xcode@v1
+        with:
+          xcode-version: latest-stable
+      
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          
+      - name: Install Python Dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install Pillow  # For DMG background creation
+      
+      # 3. Extract version
+      - name: Extract Version
+        id: version
+        run: |
+          if [[ "${{ github.event_name }}" == "workflow_dispatch" ]]; then
+            VERSION="${{ github.event.inputs.version }}"
+          else
+            VERSION=${GITHUB_REF#refs/tags/}
+          fi
+          echo "VERSION=$VERSION" >> $GITHUB_OUTPUT
+          echo "VERSION_NUMBER=${VERSION#v}" >> $GITHUB_OUTPUT
+          echo "Building version: $VERSION"
+      
+      # 4. Update version in project
+      - name: Update Project Version
+        run: |
+          VERSION_NUMBER="${{ steps.version.outputs.VERSION_NUMBER }}"
+          
+          # Update Info.plist versions
+          /usr/libexec/PlistBuddy -c "Set :CFBundleShortVersionString $VERSION_NUMBER" \
+            "video2ppt/Video2PPT/Info.plist" || true
+          /usr/libexec/PlistBuddy -c "Set :CFBundleVersion $VERSION_NUMBER" \
+            "video2ppt/Video2PPT/Info.plist" || true
+            
+          # Update Python module version
+          sed -i '' "s/__version__ = .*/__version__ = \"$VERSION_NUMBER\"/" \
+            "video2ppt/__init__.py" || true
+      
+      # 5. Build the app
+      - name: Build Application
+        run: |
+          echo "📦 Building Video2PPT..."
+          
+          # Clean previous builds
+          rm -rf "${{ env.BUILD_DIR }}"
+          
+          # Build release configuration
+          xcodebuild \
+            -project "${{ env.XCODE_PROJECT }}" \
+            -scheme "${{ env.SCHEME }}" \
+            -configuration Release \
+            -derivedDataPath "${{ env.BUILD_DIR }}" \
+            clean build \
+            CODE_SIGN_IDENTITY="" \
+            CODE_SIGNING_REQUIRED=NO \
+            CODE_SIGNING_ALLOWED=NO \
+            PRODUCT_BUNDLE_IDENTIFIER="com.video2ppt.Video2PPT" \
+            | xcpretty
+          
+          # Verify build
+          if [ ! -d "${{ env.BUILD_DIR }}/Build/Products/Release/${{ env.APP_NAME }}.app" ]; then
+            echo "❌ Build failed - app not found"
+            exit 1
+          fi
+          
+          echo "✅ Build successful"
+      
+      # 6. Create DMG background
+      - name: Create DMG Background
+        run: |
+          echo "🎨 Creating DMG background..."
+          python3 create_dmg_background.py || echo "Using default background"
+      
+      # 7. Create DMG installer
+      - name: Create DMG
+        id: dmg
+        run: |
+          VERSION="${{ steps.version.outputs.VERSION }}"
+          DMG_NAME="${{ env.APP_NAME }}-${VERSION}.dmg"
+          APP_PATH="${{ env.BUILD_DIR }}/Build/Products/Release/${{ env.APP_NAME }}.app"
+          
+          echo "💿 Creating DMG: $DMG_NAME"
+          
+          # Create temporary DMG directory
+          DMG_TEMP="dmg_temp"
+          rm -rf "$DMG_TEMP"
+          mkdir -p "$DMG_TEMP/.background"
+          
+          # Copy app
+          cp -r "$APP_PATH" "$DMG_TEMP/"
+          
+          # Create Applications symlink
+          ln -s /Applications "$DMG_TEMP/Applications"
+          
+          # Copy background if exists
+          if [ -f "dmg_background.png" ]; then
+            cp "dmg_background.png" "$DMG_TEMP/.background/background.png"
+          fi
+          
+          # Create README
+          cat > "$DMG_TEMP/README.txt" << EOF
+          Video2PPT ${VERSION}
+          ===================
+          
+          Installation:
+          1. Drag Video2PPT to Applications folder
+          2. Launch Video2PPT
+          3. Enable Finder extension in System Settings
+          
+          For more info: https://github.com/${{ github.repository }}
+          EOF
+          
+          # Create temporary DMG
+          hdiutil create -srcfolder "$DMG_TEMP" -volname "${{ env.APP_NAME }}" \
+            -fs HFS+ -format UDRW -size 150m "${DMG_NAME}.tmp.dmg"
+          
+          # Mount and configure
+          DEVICE=$(hdiutil attach "${DMG_NAME}.tmp.dmg" -readwrite -noverify -noautoopen | \
+                   egrep '^/dev/' | sed 1q | awk '{print $1}')
+          
+          sleep 2
+          
+          # Apply window settings with AppleScript
+          osascript << EOT
+          tell application "Finder"
+            tell disk "${{ env.APP_NAME }}"
+              open
+              set current view of container window to icon view
+              set toolbar visible of container window to false
+              set statusbar visible of container window to false
+              set bounds of container window to {400, 100, 900, 450}
+              set viewOptions to icon view options of container window
+              set arrangement of viewOptions to not arranged
+              set icon size of viewOptions to 72
+              set position of item "${{ env.APP_NAME }}.app" of container window to {125, 175}
+              set position of item "Applications" of container window to {375, 175}
+              try
+                set position of item "README.txt" of container window to {250, 320}
+              end try
+              update without registering applications
+              delay 2
+              close
+            end tell
+          end tell
+          EOT
+          
+          sync
+          
+          # Unmount
+          hdiutil detach "$DEVICE"
+          
+          # Convert to compressed DMG
+          hdiutil convert "${DMG_NAME}.tmp.dmg" -format UDZO -o "$DMG_NAME"
+          rm -f "${DMG_NAME}.tmp.dmg"
+          
+          # Clean up
+          rm -rf "$DMG_TEMP"
+          
+          # Output info
+          echo "DMG_PATH=$DMG_NAME" >> $GITHUB_OUTPUT
+          echo "DMG_SIZE=$(du -h "$DMG_NAME" | cut -f1)" >> $GITHUB_OUTPUT
+          
+          echo "✅ DMG created: $DMG_NAME"
+      
+      # 8. Generate changelog
+      - name: Generate Changelog
+        id: changelog
+        run: |
+          VERSION="${{ steps.version.outputs.VERSION }}"
+          
+          # Get previous tag
+          PREV_TAG=$(git describe --tags --abbrev=0 ${VERSION}^ 2>/dev/null || echo "")
+          
+          if [ -z "$PREV_TAG" ]; then
+            echo "First release"
+            CHANGELOG="🎉 Initial Release"
+          else
+            echo "Changes since $PREV_TAG"
+            # Generate changelog from commits
+            CHANGELOG=$(git log ${PREV_TAG}..${VERSION} --pretty=format:"- %s" --reverse | \
+              grep -E "^- (feat|fix|docs|style|refactor|perf|test|chore|build|ci):" || \
+              echo "- Various improvements and bug fixes")
+          fi
+          
+          # Create release notes
+          cat > release_notes.md << EOF
+          # Video2PPT ${VERSION}
+          
+          ## 📦 Installation
+          
+          1. Download the DMG file below
+          2. Open the DMG and drag Video2PPT to Applications
+          3. Enable the Finder extension in System Settings
+          
+          ## 🚀 What's New
+          
+          ${CHANGELOG}
+          
+          ## 📋 Features
+          
+          - 🎨 Beautiful native macOS interface
+          - 🔄 Re-convert feature for quick iterations
+          - 🖱️ Right-click context menu in Finder
+          - 🎯 Smart frame extraction with similarity detection
+          - 📁 Export to PNG frames or PDF document
+          
+          ## 📊 Release Info
+          
+          - **Version**: ${VERSION}
+          - **DMG Size**: ${{ steps.dmg.outputs.DMG_SIZE }}
+          - **Build Date**: $(date '+%Y-%m-%d')
+          - **macOS Requirement**: 11.0+
+          
+          ## 🐛 Known Issues
+          
+          Please report any issues at: https://github.com/${{ github.repository }}/issues
+          
+          ---
+          
+          **Full Changelog**: https://github.com/${{ github.repository }}/compare/${PREV_TAG}...${VERSION}
+          EOF
+          
+          # Output for use in release
+          echo "CHANGELOG<<EOF" >> $GITHUB_OUTPUT
+          cat release_notes.md >> $GITHUB_OUTPUT
+          echo "EOF" >> $GITHUB_OUTPUT
+      
+      # 9. Create GitHub Release
+      - name: Create Release
+        uses: softprops/action-gh-release@v1
+        with:
+          tag_name: ${{ steps.version.outputs.VERSION }}
+          name: Video2PPT ${{ steps.version.outputs.VERSION }}
+          body: ${{ steps.changelog.outputs.CHANGELOG }}
+          draft: false
+          prerelease: ${{ contains(steps.version.outputs.VERSION, '-beta') || contains(steps.version.outputs.VERSION, '-alpha') }}
+          files: |
+            ${{ steps.dmg.outputs.DMG_PATH }}
+            
+      # 10. Upload artifacts (backup)
+      - name: Upload DMG Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: Video2PPT-${{ steps.version.outputs.VERSION }}
+          path: ${{ steps.dmg.outputs.DMG_PATH }}
+          retention-days: 30
+      
+      # 11. Notify success
+      - name: Release Summary
+        run: |
+          echo "🎉 Release ${{ steps.version.outputs.VERSION }} created successfully!"
+          echo ""
+          echo "📦 DMG: ${{ steps.dmg.outputs.DMG_PATH }}"
+          echo "📏 Size: ${{ steps.dmg.outputs.DMG_SIZE }}"
+          echo "🔗 URL: https://github.com/${{ github.repository }}/releases/tag/${{ steps.version.outputs.VERSION }}"
+          
+  # Optional: Build for multiple macOS versions
+  build-matrix:
+    name: Build for macOS ${{ matrix.macos }}
+    runs-on: ${{ matrix.runner }}
+    if: false  # Enable this if you want to build for multiple macOS versions
+    strategy:
+      matrix:
+        include:
+          - macos: "11"
+            runner: macos-11
+          - macos: "12"
+            runner: macos-12
+          - macos: "13"
+            runner: macos-13
+          - macos: "14"
+            runner: macos-latest
+    
+    steps:
+      # Similar steps as above but with matrix.macos specific builds
+      - name: Placeholder
+        run: echo "Build for macOS ${{ matrix.macos }}"

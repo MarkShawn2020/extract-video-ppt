@@ -155,6 +155,9 @@ output.pdf
 *.dmg
 dmg_temp/
 dmg_*.png
+dmg_background.png
+Video2PPT-*.dmg
+*.tmp.dmg
 
 # Debug scripts
 debug_*.sh
@@ -187,5 +190,13 @@ yarn-error.log*
 *.backup
 *.old
 *.orig
-*.rej.DS_Store
-.DS_Store
+*.rej
+
+# GitHub Actions artifacts
+release_notes.md
+Video2PPT-v*.dmg
+.github/workflows/*.log
+
+# Release testing
+*-test.dmg
+dmg_test_temp/
